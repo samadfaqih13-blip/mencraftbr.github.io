@@ -1,0 +1,11 @@
+Letakkan foto asli mitra di folder ini dengan nama:
+- bucket-bunga.jpg
+- bucket-uang.jpg
+- bucket-snack.jpg
+- round-bucket.jpg
+- bucket-boneka.jpg
+- bucket-profesi.jpg
+- tentang-mencraft.jpg
+
+Jika file belum tersedia, website menampilkan gambar placeholder secara otomatis.
+Logo dapat ditambahkan kemudian dan disematkan pada navbar setelah file logonya diterima.
