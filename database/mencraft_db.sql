@@ -1,4 +1,3 @@
-
 -- =========================================================
 -- DATABASE MENCRAFT
 -- =========================================================
@@ -19,8 +18,7 @@ CREATE TABLE IF NOT EXISTS products (
     product_code VARCHAR(30) NOT NULL UNIQUE,
     name VARCHAR(100) NOT NULL,
     category VARCHAR(100) NOT NULL,
-    min_price INT UNSIGNED NOT NULL,
-    max_price INT UNSIGNED NOT NULL,
+    price INT UNSIGNED NOT NULL,
     description TEXT NOT NULL,
     image VARCHAR(255) NOT NULL,
     is_active TINYINT(1) NOT NULL DEFAULT 1,
@@ -95,8 +93,7 @@ INSERT INTO products (
     product_code,
     name,
     category,
-    min_price,
-    max_price,
+    price,
     description,
     image
 ) VALUES
@@ -106,7 +103,6 @@ INSERT INTO products (
     'Bucket Bunga',
     'Bucket Bunga',
     35000,
-    200000,
     'Bucket bunga artificial dengan pilihan warna wrapping.',
     'bunga.jpeg'
 ),
@@ -116,7 +112,6 @@ INSERT INTO products (
     'Bucket Uang',
     'Bucket Uang',
     85000,
-    515000,
     'Harga sesuai jumlah lembaran uang yang ditentukan customer.',
     'uang.jpeg'
 ),
@@ -126,7 +121,6 @@ INSERT INTO products (
     'Bucket Snack',
     'Bucket Snack',
     50000,
-    500000,
     'Harga menyesuaikan jenis dan jumlah snack di dalam bucket.',
     'snack.jpeg'
 ),
@@ -136,7 +130,6 @@ INSERT INTO products (
     'Round Bucket',
     'Round Bucket',
     200000,
-    500000,
     'Round bucket menggunakan wrapping yang lebih premium.',
     'round.jpeg'
 ),
@@ -146,7 +139,6 @@ INSERT INTO products (
     'Bucket Boneka',
     'Bucket Boneka',
     65000,
-    150000,
     'Bucket yang memadukan boneka dan bunga.',
     'boneka.jpeg'
 ),
@@ -156,7 +148,6 @@ INSERT INTO products (
     'Bucket Profesi',
     'Bucket Profesi',
     200000,
-    500000,
     'Tersedia tema profesi Polisi, Pelayaran, TNI, Satpam, dan Dokter.',
     'profesi.jpeg'
 )
@@ -164,8 +155,7 @@ INSERT INTO products (
 ON DUPLICATE KEY UPDATE
     name = VALUES(name),
     category = VALUES(category),
-    min_price = VALUES(min_price),
-    max_price = VALUES(max_price),
+    price = VALUES(price),
     description = VALUES(description),
     image = VALUES(image),
     is_active = 1;

@@ -1,13 +1,12 @@
 
 /* Data produk statis. Ganti nama file gambar pada properti image setelah foto mitra tersedia. */
 
-const PRODUCTS = [
+let PRODUCTS = [
     {
         id: "bunga",
         name: "Bucket Bunga",
         category: "Bucket Bunga",
-        min: 35000,
-        max: 200000,
+        price: 35000,
         description: "Bucket bunga artificial dengan pilihan warna wrapping.",
         image: "bunga.jpeg"
     },
@@ -15,8 +14,7 @@ const PRODUCTS = [
         id: "uang",
         name: "Bucket Uang",
         category: "Bucket Uang",
-        min: 85000,
-        max: 515000,
+        price: 85000,
         description: "Harga sesuai jumlah lembaran uang yang ditentukan customer.",
         image: "uang.jpeg"
     },
@@ -24,8 +22,7 @@ const PRODUCTS = [
         id: "snack",
         name: "Bucket Snack",
         category: "Bucket Snack",
-        min: 50000,
-        max: 500000,
+        price: 50000,
         description: "Harga menyesuaikan jenis dan jumlah snack di dalam bucket.",
         image: "snack.jpeg"
     },
@@ -33,8 +30,7 @@ const PRODUCTS = [
         id: "round",
         name: "Round Bucket",
         category: "Round Bucket",
-        min: 200000,
-        max: 500000,
+        price: 200000,
         description: "Round bucket menggunakan wrapping yang lebih premium.",
         image: "round.jpeg"
     },
@@ -42,8 +38,7 @@ const PRODUCTS = [
         id: "boneka",
         name: "Bucket Boneka",
         category: "Bucket Boneka",
-        min: 65000,
-        max: 150000,
+        price: 65000,
         description: "Bucket yang memadukan boneka dan bunga.",
         image: "boneka.jpeg"
     },
@@ -51,8 +46,7 @@ const PRODUCTS = [
         id: "profesi",
         name: "Bucket Profesi",
         category: "Bucket Profesi",
-        min: 200000,
-        max: 500000,
+        price: 200000,
         description: "Tersedia tema profesi Polisi, Pelayaran, TNI, Satpam, dan Dokter.",
         image: "profesi.jpeg"
     },
@@ -67,8 +61,7 @@ const formatRupiah = n =>
         maximumFractionDigits: 0
     }).format(n);
 
-const priceRange = p =>
-    `${formatRupiah(p.min)} – ${formatRupiah(p.max)}`;
+const priceRange = p => formatRupiah(p.price);
 
 const getCart = () =>
     JSON.parse(localStorage.getItem("mencraftCart") || "[]");
@@ -233,7 +226,7 @@ function renderCart() {
 
         if (!p) return "";
 
-        const line = p.min * item.qty;
+        const line = p.price * item.qty;
         subtotal += line;
 
         return `
@@ -357,7 +350,7 @@ function renderCheckout() {
 
         if (!p) return "";
 
-        subtotal += p.min * item.qty;
+        subtotal += p.price * item.qty;
 
         return `
             <div class="summary-item">
@@ -369,7 +362,7 @@ function renderCheckout() {
                     </small>
                 </span>
 
-                <strong>${formatRupiah(p.min * item.qty)}</strong>
+                <strong>${formatRupiah(p.price * item.qty)}</strong>
             </div>
         `;
     }).join("");
@@ -378,7 +371,21 @@ function renderCheckout() {
     $("#checkout-total").text(formatRupiah(subtotal));
 }
 
-$(function () {
+async function loadProductsFromDatabase() {
+    try {
+        const response = await fetch("api/products.php", { cache: "no-store" });
+        const result = await response.json();
+        if (result.success && Array.isArray(result.data)) {
+            PRODUCTS.length = 0;
+            PRODUCTS.push(...result.data);
+        }
+    } catch (error) {
+        console.warn("Produk database tidak dapat dimuat. Menggunakan data bawaan.", error);
+    }
+}
+
+$(async function () {
+    await loadProductsFromDatabase();
     updateCartCount();
 
     if ($("#featured-products").length) {
@@ -459,9 +466,9 @@ $(function () {
             if (!result.success) throw new Error(result.message || "Pesanan gagal disimpan.");
             const lines = cart.map(item => {
                 const p = PRODUCTS.find(x => x.id === item.id);
-                return p ? `- ${p.name} x${item.qty}\n  Warna: ${item.color}\n  Model: ${item.model}\n  Harga mulai: ${formatRupiah(p.min * item.qty)}` : "";
+                return p ? `- ${p.name} x${item.qty}\n  Warna: ${item.color}\n  Model: ${item.model}\n  Harga: ${formatRupiah(p.price * item.qty)}` : "";
             }).filter(Boolean);
-            const total = cart.reduce((sum,item) => { const p=PRODUCTS.find(x=>x.id===item.id); return sum+(p?p.min*item.qty:0); },0);
+            const total = cart.reduce((sum,item) => { const p=PRODUCTS.find(x=>x.id===item.id); return sum+(p?p.price*item.qty:0); },0);
             const message = `Halo @mencraft.id, saya ingin konfirmasi pesanan dari website.\n\nKode Pesanan: ${result.data.order_code}\nNama: ${name}\nWhatsApp pelanggan: ${phone}\nAlamat: ${address}\n\nDetail pesanan:\n${lines.join("\n")}\n\nSubtotal minimum produk: ${formatRupiah(total)}\nMetode pembayaran: ${payment}\nCatatan custom: ${note || "-"}\n\nPesanan sudah tercatat di sistem dengan kode ${result.data.order_code}. Mohon konfirmasi harga akhir, ketersediaan, ongkos kirim, dan detail pembayaran. Saya memahami bucket custom dipesan minimal H-1. Terima kasih.`;
             window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, "_blank", "noopener");
             localStorage.removeItem("mencraftCart");
